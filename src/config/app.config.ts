@@ -8,6 +8,7 @@ export const validationSchema = Joi.object({
 
   // Database
   DATABASE_URL: Joi.string().uri().required(),
+  RUN_MIGRATIONS: Joi.boolean().default(false),
 
   // Redis (BullMQ)
   REDIS_URL: Joi.string().uri().required(),
