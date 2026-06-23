@@ -1,10 +1,9 @@
 {
   "name": "chapar",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "description": "A generic, multi-channel notification gateway for microservices.",
+  "author": "Mohammad Nasher <nasher.themo@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -51,6 +50,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.18.0",
+    "@jest/globals": "29.7.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
