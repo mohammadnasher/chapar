@@ -8,6 +8,8 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
+      # Serve the HTTP API only; the worker service consumes the queue.
+      CHAPAR_ROLE: api
       # Apply pending migrations from a single instance (the API) on startup.
       RUN_MIGRATIONS: 'true'
       # Connection URLs must point at the compose service names (not localhost).
@@ -39,7 +41,8 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
-      WORKER_MODE: 'true'
+      # Consume the queue and send notifications; no public API.
+      CHAPAR_ROLE: worker
       # Workers never run migrations (the API owns that to avoid races).
       RUN_MIGRATIONS: 'false'
       # Connection URLs must point at the compose service names (not localhost).

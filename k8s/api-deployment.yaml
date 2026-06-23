@@ -35,6 +35,9 @@ spec:
                 name: chapar-config
             - secretRef:
                 name: chapar-secret
+          env:
+            - name: CHAPAR_ROLE
+              value: "api"
           securityContext:
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false

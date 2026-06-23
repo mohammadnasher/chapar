@@ -38,6 +38,20 @@ delivery, automatic retries, and full audit history.
 The API layer and workers scale independently — spin up more workers to drain a large
 queue without touching the API.
 
+### Roles (`CHAPAR_ROLE`)
+
+The same image runs in one of three roles, selected by the `CHAPAR_ROLE` env var:
+
+| Role               | Serves HTTP (`/notify`, `/logs`) | Consumes the queue (sends) | Use it for                        |
+| ------------------ | -------------------------------- | -------------------------- | --------------------------------- |
+| `api`              | ✅                               | ❌                         | Public ingress, scale with traffic |
+| `worker`           | health/metrics only              | ✅                         | Sending, scale with throughput     |
+| `all` *(default)*  | ✅                               | ✅                         | Local dev / small single-process deploys |
+
+Both `api` and `worker` still expose `/health` and `/metrics` (so Kubernetes can probe
+and Prometheus can scrape the send/fail counters, which are incremented worker-side).
+`docker-compose.yml` runs `api` + `worker`; a bare `pnpm start:dev` defaults to `all`.
+
 ## Tech Stack
 
 | Concern        | Choice                          |

@@ -35,8 +35,10 @@ spec:
             - secretRef:
                 name: chapar-secret
           env:
-            - name: WORKER_MODE
-              value: "true"
+            - name: CHAPAR_ROLE
+              value: "worker"
+            - name: RUN_MIGRATIONS
+              value: "false"
           securityContext:
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
