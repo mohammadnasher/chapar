@@ -159,6 +159,9 @@ export class TelegramProvider extends BaseProvider {
 }
 ```
 
+👉 For the full step-by-step walkthrough (config, factory wiring, migrations, tests), see
+the **[provider guide in CONTRIBUTING.md](CONTRIBUTING.md#adding-a-notification-provider)**.
+
 ## Configuration
 
 See [`.env.example`](.env.example) for the full list. Configuration is validated with Joi
@@ -182,8 +185,12 @@ pnpm test:e2e   # end-to-end tests
 
 ## Contributing
 
-Contributions are welcome! Please open an issue to discuss substantial changes before
-submitting a pull request.
+Contributions are welcome — new providers and channels especially! Please read
+**[CONTRIBUTING.md](CONTRIBUTING.md)** for the development workflow, coding standards,
+commit conventions, and a step-by-step guide to
+[adding a notification provider](CONTRIBUTING.md#adding-a-notification-provider).
+
+For anything substantial, open an issue first so we can align on the approach.
 
 ## Author
 
