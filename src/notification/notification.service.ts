@@ -3,7 +3,11 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { NotificationLog, NotificationChannel, NotificationStatus } from './entities/notification-log.entity';
+import {
+  NotificationLog,
+  NotificationChannel,
+  NotificationStatus,
+} from './entities/notification-log.entity';
 import { SendNotificationDto } from './dto/send-notification.dto';
 import { QueryLogsDto } from './dto/query-logs.dto';
 import { NOTIFICATION_QUEUE, NOTIFICATION_JOB } from '../queue/queue.constants';
@@ -62,7 +66,7 @@ export class NotificationService {
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
 
-    const [items, total] = await this.logsRepo.findAndCount(filters as any, {
+    const [items, total] = await this.logsRepo.findAndCount(filters, {
       orderBy: { createdAt: 'DESC' as any },
       limit,
       offset: (page - 1) * limit,

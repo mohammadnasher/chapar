@@ -13,7 +13,10 @@ export interface InAppNotificationRecord {
 }
 
 @Injectable()
-export class RedisPubSubPushProvider extends BaseProvider implements OnModuleInit, OnModuleDestroy {
+export class RedisPubSubPushProvider
+  extends BaseProvider
+  implements OnModuleInit, OnModuleDestroy
+{
   readonly channel = 'push' as const;
 
   private publisher: Redis;
@@ -21,7 +24,10 @@ export class RedisPubSubPushProvider extends BaseProvider implements OnModuleIni
 
   constructor(private readonly config: ConfigService) {
     super();
-    this.channelPrefix = this.config.get<string>('REDIS_PUBSUB_CHANNEL_PREFIX', 'notifications');
+    this.channelPrefix = this.config.get<string>(
+      'REDIS_PUBSUB_CHANNEL_PREFIX',
+      'notifications',
+    );
   }
 
   onModuleInit() {
@@ -48,7 +54,10 @@ export class RedisPubSubPushProvider extends BaseProvider implements OnModuleIni
       timestamp: new Date().toISOString(),
     };
 
-    const subscribers = await this.publisher.publish(redisChannel, JSON.stringify(record));
+    const subscribers = await this.publisher.publish(
+      redisChannel,
+      JSON.stringify(record),
+    );
 
     this.logger.log(
       `In-app notification published to channel "${redisChannel}" — ${subscribers} subscriber(s)`,

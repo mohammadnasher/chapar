@@ -1,5 +1,9 @@
 import { Logger } from '@nestjs/common';
-import { NotificationChannel, NotificationPayload, NotificationProvider } from './provider.interface';
+import {
+  NotificationChannel,
+  NotificationPayload,
+  NotificationProvider,
+} from './provider.interface';
 
 export abstract class BaseProvider implements NotificationProvider {
   abstract readonly channel: NotificationChannel;

@@ -3,7 +3,10 @@ import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
-import { NotificationLog, NotificationStatus } from '../notification/entities/notification-log.entity';
+import {
+  NotificationLog,
+  NotificationStatus,
+} from '../notification/entities/notification-log.entity';
 import { ProviderFactory } from '../providers/provider.factory';
 import { TemplateService } from '../templates/template.service';
 import { MetricsService } from '../metrics/metrics.service';
@@ -25,7 +28,8 @@ export class NotificationProcessor extends WorkerHost {
   }
 
   async process(job: Job<NotificationJobData>): Promise<void> {
-    const { logId, channel, recipient, templateId, variables, subject } = job.data;
+    const { logId, channel, recipient, templateId, variables, subject } =
+      job.data;
 
     const log = await this.logsRepo.findOneOrFail({ id: logId });
     log.attempts++;
@@ -36,12 +40,20 @@ export class NotificationProcessor extends WorkerHost {
       const body = await this.templateService.render(templateId, variables);
       const provider = this.providerFactory.getProvider(channel);
 
-      await provider.send({ channel, recipient, subject, body, metadata: variables });
+      await provider.send({
+        channel,
+        recipient,
+        subject,
+        body,
+        metadata: variables,
+      });
 
       log.status = NotificationStatus.SENT;
       this.metricsService.incrementSent(channel);
 
-      this.logger.log(`Job ${job.id} dispatched via ${channel} to ${recipient}`);
+      this.logger.log(
+        `Job ${job.id} dispatched via ${channel} to ${recipient}`,
+      );
     } catch (err: any) {
       log.status = NotificationStatus.FAILED;
       log.errorMessage = err?.message ?? String(err);

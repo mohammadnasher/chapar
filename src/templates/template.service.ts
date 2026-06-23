@@ -12,7 +12,10 @@ export class TemplateService implements OnModuleInit {
     Handlebars.registerHelper('currentYear', () => new Date().getFullYear());
   }
 
-  async render(templateId: string, variables: Record<string, unknown> = {}): Promise<string> {
+  async render(
+    templateId: string,
+    variables: Record<string, unknown> = {},
+  ): Promise<string> {
     let compiled = this.cache.get(templateId);
 
     if (!compiled) {

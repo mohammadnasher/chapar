@@ -42,7 +42,15 @@ export const NotificationLogSchema = new EntitySchema<NotificationLog>({
     },
     errorMessage: { type: 'text', nullable: true, fieldName: 'error_message' },
     attempts: { type: 'integer', default: 0 },
-    createdAt: { type: 'datetime', fieldName: 'created_at', onCreate: () => new Date() },
-    updatedAt: { type: 'datetime', fieldName: 'updated_at', onUpdate: () => new Date() },
+    createdAt: {
+      type: 'datetime',
+      fieldName: 'created_at',
+      onCreate: () => new Date(),
+    },
+    updatedAt: {
+      type: 'datetime',
+      fieldName: 'updated_at',
+      onUpdate: () => new Date(),
+    },
   },
 });

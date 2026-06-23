@@ -1,6 +1,16 @@
-import { IsEnum, IsISO8601, IsInt, IsOptional, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsISO8601,
+  IsInt,
+  IsOptional,
+  Max,
+  Min,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { NotificationChannel, NotificationStatus } from '../entities/notification-log.entity';
+import {
+  NotificationChannel,
+  NotificationStatus,
+} from '../entities/notification-log.entity';
 
 export class QueryLogsDto {
   @IsOptional()

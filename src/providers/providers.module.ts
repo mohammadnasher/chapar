@@ -22,7 +22,12 @@ import { NOTIFICATION_PROVIDERS } from './provider.interface';
         firebase: FirebasePushProvider,
         redisPubSub: RedisPubSubPushProvider,
       ) => [kavehNegar, smtp, firebase, redisPubSub],
-      inject: [KavehNegarProvider, SmtpEmailProvider, FirebasePushProvider, RedisPubSubPushProvider],
+      inject: [
+        KavehNegarProvider,
+        SmtpEmailProvider,
+        FirebasePushProvider,
+        RedisPubSubPushProvider,
+      ],
     },
     ProviderFactory,
   ],
