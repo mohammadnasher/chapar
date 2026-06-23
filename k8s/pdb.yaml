@@ -1,0 +1,21 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: chapar-api-pdb
+  namespace: chapar
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: chapar-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: chapar-worker-pdb
+  namespace: chapar
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: chapar-worker

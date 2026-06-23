@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chapar-worker
+  namespace: chapar
+  labels:
+    app: chapar-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chapar-worker
+  template:
+    metadata:
+      labels:
+        app: chapar-worker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: chapar-worker
+          image: ghcr.io/mohammadnasher/chapar:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: chapar-config
+            - secretRef:
+                name: chapar-secret
+          env:
+            - name: WORKER_MODE
+              value: "true"
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chapar-config
+  namespace: chapar
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  THROTTLE_TTL: "60"
+  THROTTLE_LIMIT: "100"
+  SMTP_PORT: "587"
+  FIREBASE_NOTIFICATION: "false"
+  REDIS_PUBSUB_CHANNEL_PREFIX: "notifications"
