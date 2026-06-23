@@ -19,7 +19,7 @@ export class RedisPubSubPushProvider
 {
   readonly channel = 'push' as const;
 
-  private publisher: Redis;
+  private publisher?: Redis;
   private readonly channelPrefix: string;
 
   constructor(private readonly config: ConfigService) {
@@ -31,6 +31,12 @@ export class RedisPubSubPushProvider
   }
 
   onModuleInit() {
+    // Only connect when Redis Pub/Sub is the selected push strategy, so the app
+    // can boot (and skip this connection) when push is delivered via Firebase.
+    if (this.config.get<boolean>('FIREBASE_NOTIFICATION', false)) {
+      return;
+    }
+
     const pubsubUrl = this.config.getOrThrow<string>('REDIS_PUBSUB_URL');
     this.publisher = new Redis(pubsubUrl, {
       enableReadyCheck: true,
@@ -40,7 +46,16 @@ export class RedisPubSubPushProvider
   }
 
   async onModuleDestroy() {
-    await this.publisher.quit();
+    await this.publisher?.quit();
+  }
+
+  private getPublisher(): Redis {
+    if (!this.publisher) {
+      throw new Error(
+        'Redis Pub/Sub push provider is not configured (set FIREBASE_NOTIFICATION=false and REDIS_PUBSUB_URL)',
+      );
+    }
+    return this.publisher;
   }
 
   async send(payload: NotificationPayload): Promise<void> {
@@ -54,7 +69,7 @@ export class RedisPubSubPushProvider
       timestamp: new Date().toISOString(),
     };
 
-    const subscribers = await this.publisher.publish(
+    const subscribers = await this.getPublisher().publish(
       redisChannel,
       JSON.stringify(record),
     );
@@ -66,7 +81,7 @@ export class RedisPubSubPushProvider
 
   async healthCheck(): Promise<boolean> {
     try {
-      const pong = await this.publisher.ping();
+      const pong = await this.getPublisher().ping();
       return pong === 'PONG';
     } catch {
       return false;

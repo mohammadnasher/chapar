@@ -10,14 +10,21 @@ import { NotificationPayload } from '../provider.interface';
 export class FirebasePushProvider extends BaseProvider implements OnModuleInit {
   readonly channel = 'push' as const;
 
-  private app!: App;
-  private messaging!: Messaging;
+  private app?: App;
+  private messaging?: Messaging;
 
   constructor(private readonly config: ConfigService) {
     super();
   }
 
   onModuleInit() {
+    // Only initialize Firebase when it is the selected push strategy. This keeps
+    // the app bootable (and avoids requiring Firebase credentials) when push is
+    // delivered via Redis Pub/Sub instead.
+    if (!this.config.get<boolean>('FIREBASE_NOTIFICATION', false)) {
+      return;
+    }
+
     const credentialsJson = this.config.getOrThrow<string>(
       'FIREBASE_CREDENTIALS_JSON',
     );
@@ -35,8 +42,17 @@ export class FirebasePushProvider extends BaseProvider implements OnModuleInit {
     this.messaging = getMessaging(this.app);
   }
 
+  private getMessaging(): Messaging {
+    if (!this.messaging) {
+      throw new Error(
+        'Firebase push provider is not configured (set FIREBASE_NOTIFICATION=true and FIREBASE_CREDENTIALS_JSON)',
+      );
+    }
+    return this.messaging;
+  }
+
   async send(payload: NotificationPayload): Promise<void> {
-    await this.messaging.send({
+    await this.getMessaging().send({
       token: payload.recipient,
       notification: {
         title: payload.subject ?? 'Notification',
@@ -52,7 +68,7 @@ export class FirebasePushProvider extends BaseProvider implements OnModuleInit {
   async healthCheck(): Promise<boolean> {
     try {
       // Dry-run with an invalid token; Firebase returns an error but confirms connectivity
-      await this.messaging.send(
+      await this.getMessaging().send(
         { token: 'health-check', notification: { title: 'ping' } },
         true,
       );

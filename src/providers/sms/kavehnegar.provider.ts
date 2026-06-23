@@ -7,16 +7,25 @@ import { NotificationPayload } from '../provider.interface';
 export class KavehNegarProvider extends BaseProvider {
   readonly channel = 'sms' as const;
 
-  private readonly apiKey: string;
   private readonly baseUrl = 'https://api.kavenegar.com/v1';
 
   constructor(private readonly config: ConfigService) {
     super();
-    this.apiKey = this.config.getOrThrow<string>('KAVEHNEGAR_API_KEY');
+  }
+
+  /** Resolve the API key lazily so the app can boot without SMS configured. */
+  private getApiKey(): string {
+    const apiKey = this.config.get<string>('KAVEHNEGAR_API_KEY');
+    if (!apiKey) {
+      throw new Error(
+        'KavehNegar SMS provider is not configured (KAVEHNEGAR_API_KEY is missing)',
+      );
+    }
+    return apiKey;
   }
 
   async send(payload: NotificationPayload): Promise<void> {
-    const url = `${this.baseUrl}/${this.apiKey}/sms/send.json`;
+    const url = `${this.baseUrl}/${this.getApiKey()}/sms/send.json`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -37,7 +46,7 @@ export class KavehNegarProvider extends BaseProvider {
 
   async healthCheck(): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}/${this.apiKey}/account/info.json`;
+      const url = `${this.baseUrl}/${this.getApiKey()}/account/info.json`;
       const response = await fetch(url);
       return response.ok;
     } catch {
