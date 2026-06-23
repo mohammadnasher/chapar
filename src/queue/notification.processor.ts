@@ -1,8 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository, EntityManager } from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/core';
 import {
   NotificationLog,
   NotificationStatus,
@@ -17,8 +16,6 @@ export class NotificationProcessor extends WorkerHost {
   private readonly logger = new Logger(NotificationProcessor.name);
 
   constructor(
-    @InjectRepository(NotificationLog)
-    private readonly logsRepo: EntityRepository<NotificationLog>,
     private readonly em: EntityManager,
     private readonly providerFactory: ProviderFactory,
     private readonly templateService: TemplateService,
@@ -31,7 +28,10 @@ export class NotificationProcessor extends WorkerHost {
     const { logId, channel, recipient, templateId, variables, subject } =
       job.data;
 
-    const log = await this.logsRepo.findOneOrFail({ id: logId });
+    // Workers run outside the Nest request context, so fork a dedicated
+    // EntityManager per job rather than using the (disallowed) global instance.
+    const em = this.em.fork();
+    const log = await em.findOneOrFail(NotificationLog, { id: logId });
     log.attempts++;
 
     const timer = this.metricsService.startProcessingTimer(channel);
@@ -67,7 +67,7 @@ export class NotificationProcessor extends WorkerHost {
       throw err; // re-throw so BullMQ handles retry/backoff
     } finally {
       timer();
-      await this.em.flush();
+      await em.flush();
     }
   }
 }
