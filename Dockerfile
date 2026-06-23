@@ -1,7 +1,9 @@
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+# Node 22+ is required at build & runtime: @mikro-orm/core v7 uses fs.globSync
+# (Node >= 22.17) and modern pnpm relies on node:sqlite (Node 22+).
+FROM node:22-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
 WORKDIR /app
 
@@ -15,7 +17,7 @@ RUN pnpm build
 RUN pnpm prune --prod
 
 # ── Stage 2: Runner ───────────────────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 RUN addgroup -S chapar && adduser -S chapar -G chapar
 
