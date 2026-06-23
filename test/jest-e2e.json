@@ -3,8 +3,12 @@
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
-  "extensionsToTreatAsEsm": [".ts"],
   "transform": {
-    "^.+\\.(t|j)s$": ["ts-jest", { "useESM": true }]
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@mikro-orm/core$": "<rootDir>/stubs/mikro-orm-core.ts",
+    "^@mikro-orm/nestjs$": "<rootDir>/stubs/mikro-orm-nestjs.ts",
+    "^uuid$": "<rootDir>/stubs/uuid.ts"
   }
 }

@@ -29,7 +29,10 @@ describe('TemplateService', () => {
   it('renders a template with the provided variables', async () => {
     writeTemplate('greeting', 'Hello, {{name}}! Code: {{code}}');
 
-    const output = await service.render('greeting', { name: 'Ada', code: '1234' });
+    const output = await service.render('greeting', {
+      name: 'Ada',
+      code: '1234',
+    });
 
     expect(output).toBe('Hello, Ada! Code: 1234');
   });
@@ -59,6 +62,8 @@ describe('TemplateService', () => {
   });
 
   it('throws NotFoundException when the template file is missing', async () => {
-    await expect(service.render('does-not-exist')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.render('does-not-exist')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });

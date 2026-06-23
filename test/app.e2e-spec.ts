@@ -21,10 +21,11 @@ describe('Health (e2e)', () => {
 
   it('GET /health returns 200 with ok status and a timestamp', async () => {
     const res = await request(app.getHttpServer()).get('/health').expect(200);
+    const body = res.body as { status: string; timestamp: string };
 
-    expect(res.body.status).toBe('ok');
-    expect(typeof res.body.timestamp).toBe('string');
-    expect(Number.isNaN(Date.parse(res.body.timestamp))).toBe(false);
+    expect(body.status).toBe('ok');
+    expect(typeof body.timestamp).toBe('string');
+    expect(Number.isNaN(Date.parse(body.timestamp))).toBe(false);
   });
 
   it('GET /health is public (no X-API-Key header required)', async () => {

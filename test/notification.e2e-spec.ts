@@ -47,7 +47,11 @@ describe('Notification (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
   });
@@ -73,14 +77,18 @@ describe('Notification (e2e)', () => {
         })
         .expect(202);
 
-      expect(res.body).toHaveProperty('logId');
-      expect(typeof res.body.logId).toBe('string');
+      const body = res.body as { logId: string };
+      expect(body).toHaveProperty('logId');
+      expect(typeof body.logId).toBe('string');
 
       expect(em.persist).toHaveBeenCalledTimes(1);
       expect(em.flush).toHaveBeenCalledTimes(1);
       expect(queue.add).toHaveBeenCalledTimes(1);
 
-      const [jobName, jobData] = queue.add.mock.calls[0];
+      const [jobName, jobData] = queue.add.mock.calls[0] as [
+        string,
+        Record<string, unknown>,
+      ];
       expect(jobName).toBe('dispatch');
       expect(jobData).toMatchObject({
         channel: 'email',
@@ -123,12 +131,17 @@ describe('Notification (e2e)', () => {
         meta: { total: 1, page: 1, limit: 20, pages: 1 },
       });
 
-      const [filters] = logsRepo.findAndCount.mock.calls[0];
+      const [filters] = logsRepo.findAndCount.mock.calls[0] as [
+        Record<string, unknown>,
+      ];
       expect(filters).toMatchObject({ channel: 'email' });
     });
 
     it('rejects an invalid query parameter with 400', async () => {
-      await request(app.getHttpServer()).get('/logs').query({ limit: 9999 }).expect(400);
+      await request(app.getHttpServer())
+        .get('/logs')
+        .query({ limit: 9999 })
+        .expect(400);
 
       expect(logsRepo.findAndCount).not.toHaveBeenCalled();
     });

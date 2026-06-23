@@ -26,7 +26,10 @@ describe('ProviderFactory', () => {
   };
 
   const buildFactory = (firebaseEnabled: boolean): ProviderFactory =>
-    new ProviderFactory([smsProvider, firebase, redis], makeConfig(firebaseEnabled));
+    new ProviderFactory(
+      [smsProvider, firebase, redis],
+      makeConfig(firebaseEnabled),
+    );
 
   it('selects the Firebase push provider when FIREBASE_NOTIFICATION is true', () => {
     const factory = buildFactory(true);
