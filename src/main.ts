@@ -6,11 +6,14 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { getRole } from './config/runtime';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'warn', 'error'],
   });
+
+  Logger.log(`Starting Chapar in "${getRole()}" role`, 'Bootstrap');
 
   const config = app.get(ConfigService);
 

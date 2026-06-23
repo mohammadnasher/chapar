@@ -6,6 +6,9 @@ export const validationSchema = Joi.object({
     .default('development'),
   PORT: Joi.number().default(3000),
 
+  // Role: 'api' serves HTTP only, 'worker' consumes the queue only, 'all' does both.
+  CHAPAR_ROLE: Joi.string().valid('api', 'worker', 'all').default('all'),
+
   // Database
   DATABASE_URL: Joi.string().uri().required(),
   RUN_MIGRATIONS: Joi.boolean().default(false),

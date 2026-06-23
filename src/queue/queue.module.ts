@@ -8,6 +8,7 @@ import { TemplateModule } from '../templates/template.module';
 import { MetricsModule } from '../metrics/metrics.module';
 import { NotificationProcessor } from './notification.processor';
 import { NOTIFICATION_QUEUE } from './queue.constants';
+import { runsWorker } from '../config/runtime';
 
 @Module({
   imports: [
@@ -37,7 +38,9 @@ import { NOTIFICATION_QUEUE } from './queue.constants';
     TemplateModule,
     MetricsModule,
   ],
-  providers: [NotificationProcessor],
+  // Only worker-capable roles consume the queue. The API just enqueues jobs (via
+  // the registered Queue above), so it must NOT register the processor.
+  providers: runsWorker() ? [NotificationProcessor] : [],
   exports: [BullModule],
 })
 export class QueueModule {}
