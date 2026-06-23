@@ -1,0 +1,217 @@
+{
+  "info": {
+    "_postman_id": "b2a7c9e4-1f3d-4a2b-9c6e-0d8f1a2b3c4d",
+    "name": "Chapar — Notification Gateway",
+    "description": "REST API collection for **Chapar**, a multi-channel notification gateway (SMS, Email, Push).\n\n## Setup\n1. Import this collection and the `chapar.postman_environment.json` environment.\n2. Select the **Chapar — Local** environment (top-right).\n3. Set the `apiKey` variable to the plaintext key whose bcrypt hash is stored in the server's `API_KEY_HASH`.\n4. Adjust `baseUrl` if the service is not on `http://localhost:3000`.\n\n## Authentication\nAll `/notify` and `/logs` requests require the `X-API-Key` header. It is set automatically at the collection level from the `{{apiKey}}` variable. `/health` and `/metrics` are public.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "X-API-Key", "type": "string" },
+      { "key": "value", "value": "{{apiKey}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Send Email Notification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 202 Accepted', function () {",
+                  "  pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test('returns a logId', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('logId');",
+                  "  pm.collectionVariables.set('lastLogId', body.logId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"email\",\n  \"recipient\": \"user@example.com\",\n  \"template\": \"welcome-email\",\n  \"subject\": \"Welcome to Chapar\",\n  \"data\": {\n    \"name\": \"Ada\",\n    \"appName\": \"Chapar\",\n    \"actionUrl\": \"https://example.com/start\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notify",
+              "host": ["{{baseUrl}}"],
+              "path": ["notify"]
+            },
+            "description": "Queue an email notification rendered from the `welcome-email` Handlebars template. Returns `202 Accepted` with the `logId` of the persisted audit record."
+          }
+        },
+        {
+          "name": "Send SMS Notification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"sms\",\n  \"recipient\": \"+989120000000\",\n  \"template\": \"otp-sms\",\n  \"data\": {\n    \"appName\": \"Chapar\",\n    \"otp\": \"482915\",\n    \"expiryMinutes\": 5\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notify",
+              "host": ["{{baseUrl}}"],
+              "path": ["notify"]
+            },
+            "description": "Queue an SMS via the KavehNegar provider. `recipient` is the destination phone number; `template` is rendered with `data`."
+          }
+        },
+        {
+          "name": "Send Push Notification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"push\",\n  \"recipient\": \"user-123\",\n  \"template\": \"push-notification\",\n  \"subject\": \"New message\",\n  \"data\": {\n    \"body\": \"You have a new message waiting.\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notify",
+              "host": ["{{baseUrl}}"],
+              "path": ["notify"]
+            },
+            "description": "Queue a push notification. Delivery depends on the server's `FIREBASE_NOTIFICATION` flag:\n- `true` → Firebase Cloud Messaging (`recipient` is a device token).\n- `false` → published to Redis Pub/Sub channel `notifications:<recipient>` for in-app delivery (`recipient` is a user id)."
+          }
+        },
+        {
+          "name": "Send Notification — Invalid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400 Bad Request', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"carrier-pigeon\",\n  \"recipient\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notify",
+              "host": ["{{baseUrl}}"],
+              "path": ["notify"]
+            },
+            "description": "Demonstrates request validation. An unsupported `channel` and a missing `template` are rejected with `400` by the global ValidationPipe before anything is queued."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "item": [
+        {
+          "name": "List Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "channel", "value": "email", "disabled": true },
+                { "key": "status", "value": "SENT", "disabled": true },
+                { "key": "from", "value": "2026-01-01T00:00:00.000Z", "disabled": true },
+                { "key": "to", "value": "2026-12-31T23:59:59.999Z", "disabled": true }
+              ]
+            },
+            "description": "Query the notification audit history. Supports filtering by `channel` (`sms|email|push`), `status` (`PENDING|SENT|FAILED`), and an ISO-8601 `from`/`to` date range. Paginated via `page` (≥1) and `limit` (1–100). Enable the disabled query params to filter."
+          }
+        },
+        {
+          "name": "List Logs — Failed Only",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs?status=FAILED&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs"],
+              "query": [
+                { "key": "status", "value": "FAILED" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Returns only notifications that exhausted all retries and ended in `FAILED`. Useful for debugging provider outages."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Operations",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('reports ok', function () {",
+                  "  pm.expect(pm.response.json().status).to.eql('ok');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Public, unauthenticated liveness/readiness probe used by Docker `HEALTHCHECK` and Kubernetes. Returns `{ status: 'ok', timestamp }`."
+          }
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["metrics"]
+            },
+            "description": "Public Prometheus scrape endpoint. Exposes `notifications_sent_total`, `notifications_failed_total`, `notification_processing_duration_seconds`, `notification_queue_depth`, plus default Node.js process metrics."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "lastLogId", "value": "", "type": "string" }
+  ]
+}
