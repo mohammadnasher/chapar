@@ -13,7 +13,7 @@ This directory documents the Chapar REST API and how to work on the project.
 2. Select the **Chapar — Local** environment (top-right dropdown).
 3. Edit the environment and set:
    - `baseUrl` — where the API runs (default `http://localhost:3000`).
-   - `apiKey` — the **plaintext** key whose bcrypt hash is configured on the server as `API_KEY_HASH`.
+   - `apiKey` — the **plaintext** key whose SHA-256 (hex) hash is configured on the server as `API_KEY_HASH`.
 4. Send requests. The `X-API-Key` header is injected automatically at the collection level, so you don't set it per request.
 
 > The "Send Email Notification" and "Health Check" requests include test scripts; run the
@@ -161,7 +161,7 @@ POST /notify ─▶ validate ─▶ persist PENDING ─▶ enqueue (BullMQ)
 
 ### Prerequisites
 
-- Node.js 20+, pnpm 9+, Docker.
+- Node.js 22+, pnpm 9+, Docker.
 
 ### First-time setup
 
@@ -169,14 +169,13 @@ POST /notify ─▶ validate ─▶ persist PENDING ─▶ enqueue (BullMQ)
 pnpm install
 cp .env.example .env
 
-# Generate the bcrypt hash for your API key and paste it into API_KEY_HASH
-node -e "require('bcrypt').hash('your-secret-key', 12).then(console.log)"
+# Generate the SHA-256 (hex) hash for your API key and paste it into API_KEY_HASH
+node -e "console.log(require('crypto').createHash('sha256').update('your-secret-key').digest('hex'))"
 
-# Bring up Postgres + Redis (and the app) via Docker
+# Bring up Postgres + Redis via Docker
 docker compose up -d postgres redis
 
-# Apply migrations, then run in watch mode
-pnpm mikro-orm migration:up
+# Apply migrations on startup (set RUN_MIGRATIONS=true in .env), then run in watch mode
 pnpm start:dev
 ```
 

@@ -52,7 +52,7 @@ queue without touching the API.
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+
 - pnpm 9+
 - Docker (for the Compose stack)
 
@@ -66,12 +66,12 @@ pnpm install
 cp .env.example .env
 # edit .env — at minimum set DATABASE_URL, REDIS_URL and API_KEY_HASH
 
-# 3. Generate an API key hash
-node -e "require('bcrypt').hash('your-secret-key', 12).then(console.log)"
+# 3. Generate an API key hash (SHA-256 hex of your key)
+node -e "console.log(require('crypto').createHash('sha256').update('your-secret-key').digest('hex'))"
 # paste the result into API_KEY_HASH
 
-# 4. Run database migrations
-pnpm mikro-orm migration:up
+# 4. Apply database migrations on startup
+# set RUN_MIGRATIONS=true in .env (the app runs pending migrations when it boots)
 
 # 5. Start in watch mode
 pnpm start:dev
