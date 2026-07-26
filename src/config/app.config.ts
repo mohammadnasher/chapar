@@ -19,6 +19,10 @@ export const validationSchema = Joi.object({
   // Security
   API_KEY_HASH: Joi.string().required(),
 
+  // Templates: optional external directory (e.g. a mounted volume) searched
+  // before the built-in templates, so images can be used without rebuilding.
+  TEMPLATES_DIR: Joi.string().allow('').optional(),
+
   // Throttler
   THROTTLE_TTL: Joi.number().default(60),
   THROTTLE_LIMIT: Joi.number().default(100),

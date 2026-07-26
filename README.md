@@ -176,6 +176,33 @@ export class TelegramProvider extends BaseProvider {
 👉 For the full step-by-step walkthrough (config, factory wiring, migrations, tests), see
 the **[provider guide in CONTRIBUTING.md](CONTRIBUTING.md#adding-a-notification-provider)**.
 
+## Custom templates (no rebuild needed)
+
+The image ships with a few built-in templates, but you can add or override templates
+**without rebuilding** — mount a directory of `.hbs` files and point `TEMPLATES_DIR` at it:
+
+```yaml
+# docker-compose
+services:
+  chapar-worker:
+    image: monasher/chapar:latest
+    environment:
+      TEMPLATES_DIR: /templates
+    volumes:
+      - ./my-templates:/templates:ro
+```
+
+```bash
+# or plain docker run
+docker run -d -v ./my-templates:/templates:ro -e TEMPLATES_DIR=/templates monasher/chapar
+```
+
+Resolution order: `TEMPLATES_DIR` first, then the built-ins — so `my-templates/welcome-email.hbs`
+overrides the bundled `welcome-email`, and any new file (e.g. `order-shipped.hbs`) becomes
+immediately addressable as `"template": "order-shipped"`. File edits are detected via mtime
+and picked up on the next render — **no restart required**. Mount the volume on whichever
+service renders: the **worker** (or the single container when `CHAPAR_ROLE=all`).
+
 ## Configuration
 
 See [`.env.example`](.env.example) for the full list. Configuration is validated with Joi
