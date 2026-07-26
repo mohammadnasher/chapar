@@ -23,22 +23,26 @@ export const validationSchema = Joi.object({
   THROTTLE_TTL: Joi.number().default(60),
   THROTTLE_LIMIT: Joi.number().default(100),
 
+  // Optional provider credentials. `.allow('')` treats an empty env var the
+  // same as an unset one — compose/Portainer pass unset ${VAR:-} as '' and the
+  // providers already handle blank values as "not configured".
+
   // KavehNegar SMS
-  KAVEHNEGAR_API_KEY: Joi.string().optional(),
+  KAVEHNEGAR_API_KEY: Joi.string().allow('').optional(),
 
   // SMTP Email
-  SMTP_HOST: Joi.string().optional(),
+  SMTP_HOST: Joi.string().allow('').optional(),
   SMTP_PORT: Joi.number().default(587),
-  SMTP_USER: Joi.string().optional(),
-  SMTP_PASS: Joi.string().optional(),
-  SMTP_FROM: Joi.string().email().optional(),
+  SMTP_USER: Joi.string().allow('').optional(),
+  SMTP_PASS: Joi.string().allow('').optional(),
+  SMTP_FROM: Joi.string().email().allow('').optional(),
 
   // Push: Firebase vs Redis Pub/Sub
   FIREBASE_NOTIFICATION: Joi.boolean().default(false),
   FIREBASE_CREDENTIALS_JSON: Joi.string().when('FIREBASE_NOTIFICATION', {
     is: true,
-    then: Joi.required(),
-    otherwise: Joi.optional(),
+    then: Joi.required().invalid(''),
+    otherwise: Joi.allow('').optional(),
   }),
   REDIS_PUBSUB_URL: Joi.string().uri().when('FIREBASE_NOTIFICATION', {
     is: false,
