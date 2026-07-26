@@ -257,10 +257,18 @@ providers.
 
 ## Adding a template
 
-Drop a `<template-id>.hbs` file into [`src/templates/hbs/`](src/templates/hbs). It is
-compiled and cached on first use; reference it by filename (without extension) as the
-`template` field in a `POST /notify` request. Variables come from the request's `data`
-object. The helper `{{currentYear}}` is available globally.
+Two ways, depending on who you are:
+
+- **Using the published image?** You don't need to touch this repo at all — mount a
+  directory of `.hbs` files and point `TEMPLATES_DIR` at it (searched *before* the
+  built-ins, so you can also override them). Edits apply on the next render, no
+  restart needed. See "Custom templates" in the [README](README.md#custom-templates-no-rebuild-needed).
+- **Contributing a built-in template?** Drop a `<template-id>.hbs` file into
+  [`src/templates/hbs/`](src/templates/hbs).
+
+Either way, reference it by filename (without extension) as the `template` field in a
+`POST /notify` request. Variables come from the request's `data` object. The helper
+`{{currentYear}}` is available globally.
 
 ---
 

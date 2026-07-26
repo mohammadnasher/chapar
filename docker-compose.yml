@@ -49,6 +49,11 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-chapar}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-chapar}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       REDIS_PUBSUB_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      # Custom templates: uncomment (with the volume below) to add/override
+      # .hbs templates without rebuilding the image.
+      # TEMPLATES_DIR: /templates
+    # volumes:
+    #   - ./templates:/templates:ro
     depends_on:
       postgres:
         condition: service_healthy
