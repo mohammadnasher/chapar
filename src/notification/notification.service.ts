@@ -42,6 +42,7 @@ export class NotificationService {
         templateId: dto.template,
         variables: dto.data ?? {},
         subject: dto.subject,
+        sender: dto.sender,
       },
       {
         jobId: `notif-${log.id}`,

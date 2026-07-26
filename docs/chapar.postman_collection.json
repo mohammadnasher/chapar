@@ -60,14 +60,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"channel\": \"sms\",\n  \"recipient\": \"+989120000000\",\n  \"template\": \"otp-sms\",\n  \"data\": {\n    \"appName\": \"Chapar\",\n    \"otp\": \"482915\",\n    \"expiryMinutes\": 5\n  }\n}"
+              "raw": "{\n  \"channel\": \"sms\",\n  \"recipient\": \"+989120000000\",\n  \"template\": \"otp-sms\",\n  \"sender\": \"10004346\",\n  \"data\": {\n    \"appName\": \"Chapar\",\n    \"otp\": \"482915\",\n    \"expiryMinutes\": 5\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/notify",
               "host": ["{{baseUrl}}"],
               "path": ["notify"]
             },
-            "description": "Queue an SMS via the KavehNegar provider. `recipient` is the destination phone number; `template` is rendered with `data`."
+            "description": "Queue an SMS via the KavehNegar provider. `recipient` is the destination phone number; `template` is rendered with `data`. Optional `sender` picks which line to send from — it must be one of the lines configured in KAVEHNEGAR_LINES (omit it to use the default/first line)."
           }
         },
         {
