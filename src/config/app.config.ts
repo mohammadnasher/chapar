@@ -29,6 +29,12 @@ export const validationSchema = Joi.object({
 
   // KavehNegar SMS
   KAVEHNEGAR_API_KEY: Joi.string().allow('').optional(),
+  // Comma-separated sender lines, e.g. "10004346,30002225". The first entry is
+  // the default; callers may pick any listed line via the `sender` field.
+  KAVEHNEGAR_LINES: Joi.string()
+    .pattern(/^\s*\+?\d+(\s*,\s*\+?\d+)*\s*$/)
+    .allow('')
+    .optional(),
 
   // SMTP Email
   SMTP_HOST: Joi.string().allow('').optional(),

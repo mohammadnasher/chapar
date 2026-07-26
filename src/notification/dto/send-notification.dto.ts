@@ -3,6 +3,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  Matches,
   MaxLength,
 } from 'class-validator';
 
@@ -28,6 +29,19 @@ export class SendNotificationDto {
   @IsString()
   @MaxLength(200)
   subject?: string;
+
+  /**
+   * Sender identity — for SMS, the line number to send from (e.g. "10004346").
+   * Must be one of the lines configured on the server (KAVEHNEGAR_LINES).
+   * Omit to use the default (first configured) line.
+   */
+  @IsOptional()
+  @IsString()
+  @Matches(/^\+?\d+$/, {
+    message: 'sender must be a numeric line number, e.g. "10004346"',
+  })
+  @MaxLength(50)
+  sender?: string;
 
   @IsOptional()
   @IsObject()

@@ -8,4 +8,6 @@ export interface NotificationJobData {
   templateId: string;
   variables: Record<string, unknown>;
   subject?: string;
+  /** Sender identity, e.g. the SMS line to send from. */
+  sender?: string;
 }

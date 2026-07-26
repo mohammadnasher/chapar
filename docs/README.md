@@ -52,6 +52,7 @@ X-API-Key: <your-key>
 | `recipient` | `string` (≤ 500)              | yes      | Phone number, email, device token, or user id.     |
 | `template`  | `string` (≤ 200)              | yes      | Template id resolved from `src/templates/hbs/`.    |
 | `subject`   | `string` (≤ 200)              | no       | Used by email/push; ignored by SMS.                |
+| `sender`    | `string` (numeric, ≤ 50)      | no       | SMS only: the line to send from (e.g. `"10004346"`). Must be listed in `KAVEHNEGAR_LINES`; omit for the default (first) line. |
 | `data`      | `object`                      | no       | Variables passed to the Handlebars template.       |
 
 **Response — `202 Accepted`**

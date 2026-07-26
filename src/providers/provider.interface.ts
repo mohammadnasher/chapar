@@ -5,6 +5,8 @@ export interface NotificationPayload {
   recipient: string;
   subject?: string;
   body: string;
+  /** Sender identity, e.g. the SMS line number to send from (provider-specific). */
+  sender?: string;
   metadata?: Record<string, unknown>;
 }
 

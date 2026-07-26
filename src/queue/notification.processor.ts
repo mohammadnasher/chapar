@@ -25,7 +25,7 @@ export class NotificationProcessor extends WorkerHost {
   }
 
   async process(job: Job<NotificationJobData>): Promise<void> {
-    const { logId, channel, recipient, templateId, variables, subject } =
+    const { logId, channel, recipient, templateId, variables, subject, sender } =
       job.data;
 
     // Workers run outside the Nest request context, so fork a dedicated
@@ -45,6 +45,7 @@ export class NotificationProcessor extends WorkerHost {
         recipient,
         subject,
         body,
+        sender,
         metadata: variables,
       });
 
